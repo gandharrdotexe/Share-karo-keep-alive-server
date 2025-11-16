@@ -1,14 +1,15 @@
-name: Keep Alive Service
+name: Keep Render Alive
 
 on:
   schedule:
-    - cron: "*/5 * * * *"   # Runs every 5 minutes
-  workflow_dispatch:        # Allows manual run
+    - cron: "*/4 * * * *"   # Runs every 4 minutes
+  workflow_dispatch:
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Render app
+      - name: Ping Render app with GET request
         run: |
-          curl -I https://share-karo.onrender.com/
+          curl -s -o /dev/null -w "%{http_code}" https://share-karo.onrender.com
+
