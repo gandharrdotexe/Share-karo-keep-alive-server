@@ -2,14 +2,29 @@ name: Keep Render Alive
 
 on:
   schedule:
-    - cron: "*/4 * * * *"   # Runs every 4 minutes
+    - cron: "*/10 * * * *"   # Runs every 10 minutes (safer margin before timeout)
+    - cron: "0 * * * *"      # Also runs at the top of every hour (backup)
   workflow_dispatch:
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Render app with GET request
+      - name: Ping Render app
         run: |
-          curl -s -o /dev/null -w "%{http_code}" https://share-karo.onrender.com
-
+          echo "Pinging Render app at $(date)"
+          response=$(curl -s -o /dev/null -w "%{http_code}" --max-time 60 https://share-karo.onrender.com)
+          echo "Response code: $response"
+          
+          if [ "$response" -eq 200 ] || [ "$response" -eq 301 ] || [ "$response" -eq 302 ]; then
+            echo "✅ App is alive!"
+          else
+            echo "⚠️ Unexpected response code: $response"
+          fi
+      
+      - name: Additional ping for redundancy
+        run: |
+          # Second ping after 30 seconds for extra safety
+          sleep 30
+          curl -s -o /dev/null --max-time 60 https://share-karo.onrender.com
+          echo "Second ping completed"
