@@ -26,5 +26,5 @@ jobs:
         run: |
           # Second ping after 30 seconds for extra safety
           sleep 30
-          curl -s -o /dev/null --max-time 60 https://share-karo.onrender.com
+          curl -s -o /dev/null --max-time 60 https://share-karo-app.onrender.com
           echo "Second ping completed"
